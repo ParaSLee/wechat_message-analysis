@@ -9,7 +9,11 @@ wechat_message_analysis 是基于 [chatlog 项目](https://github.com/sjzar/chat
 ### 🔧 前置条件
 
 
-在使用 Chatlog Web 之前，您需要先安装并运行 [chatlog](https://github.com/sjzar/chatlog) 后端服务：
+在使用 wechat_message_analysis 之前，您需要先安装并运行 [chatlog](https://github.com/sjzar/chatlog) 后端服务：
+
+> ⚠️注意⚠️
+> chatlog 会有封号风险，请注意账号安全
+> 不推荐在 mac 上运行，windows 上使用相对风险更小（本人在 mac 上已被封过 1 次）
 
 #### 1. 安装 Chatlog 项目
 
@@ -75,7 +79,6 @@ pnpm dev
 # 访问应用
 open http://localhost:3000
 ```
-
 
 ## 📄 许可证
 
