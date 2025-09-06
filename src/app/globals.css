@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* 自定义样式 */
+.ant-layout {
+  background: #f5f7fa;
+}
+
+.ant-layout-header {
+  padding: 0 24px;
+  height: 64px;
+  line-height: 64px;
+}
+
+.ant-card {
+  border-radius: 8px;
+}
+
+.ant-table-wrapper {
+  width: 100%;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .ant-layout-content {
+    padding: 12px;
+  }
+}
