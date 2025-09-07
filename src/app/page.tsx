@@ -7,16 +7,15 @@ import {
   Select, 
   DatePicker, 
   Button, 
-  Table, 
   Spin, 
   message, 
   Typography, 
   Empty,
   Progress,
-  Space
+  Table
 } from 'antd';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { motion } from 'framer-motion';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import dayjs from 'dayjs';
 import { 
   getChatrooms, 
@@ -26,6 +25,7 @@ import {
   ChatlogItem, 
   SenderStats 
 } from '@/services/api';
+import RankingBoard, { RankingItem } from '@/components/RankingBoard';
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -119,35 +119,64 @@ export default function Home() {
     }
   };
 
+  // 转换数据格式为排行榜组件所需的格式
+  const rankingData: RankingItem[] = stats.map((item) => ({
+    name: item.senderName,
+    value: item.count,
+  }));
+
   // 表格列定义
   const columns = [
     {
       title: '排名',
+      dataIndex: 'rank',
       key: 'rank',
-      render: (_: any, __: any, index: number) => index + 1,
+      width: 80,
+      render: (text: number) => (
+        <span className="font-bold text-blue-600">#{text}</span>
+      ),
     },
     {
       title: '发言人',
       dataIndex: 'senderName',
       key: 'senderName',
+      render: (text: string) => (
+        <span className="font-medium">{text}</span>
+      ),
     },
     {
       title: '发言次数',
       dataIndex: 'count',
       key: 'count',
       sorter: (a: SenderStats, b: SenderStats) => a.count - b.count,
-      defaultSortOrder: 'descend' as const,
+      render: (text: number) => (
+        <span className="text-green-600 font-semibold">{text.toLocaleString()}</span>
+      ),
+    },
+    {
+      title: '占比',
+      dataIndex: 'percentage',
+      key: 'percentage',
+      render: (text: number) => (
+        <span className="text-purple-600">{text.toFixed(2)}%</span>
+      ),
     },
   ];
 
-  // 图表数据
-  const chartData = stats.slice(0, 10).map((item) => ({
-    name: item.senderName,
-    value: item.count,
+  // 为表格数据添加排名和百分比
+  const tableData = stats.map((item, index) => ({
+    ...item,
+    key: item.senderName,
+    rank: index + 1,
+    percentage: totalMessages > 0 ? (item.count / totalMessages) * 100 : 0,
   }));
 
-  // 随机颜色生成
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1', '#a4de6c', '#d0ed57'];
+  // 图表数据（取前10名）
+  const chartData = stats.slice(0, 10).map((item, index) => ({
+    name: item.senderName,
+    count: item.count,
+    rank: index + 1,
+  }));
 
   return (
     <Layout className="min-h-screen">
@@ -155,13 +184,16 @@ export default function Home() {
         <Title level={3} className="m-0 text-blue-600">微信群聊消息统计分析</Title>
       </Header>
       
-      <Content className="p-6">
+      <Content className="p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="space-y-12"
         >
-          <Card className="mb-6 shadow-sm">
+          <div className='mb-8'>
+
+          <Card className="shadow-sm">
             <div className="flex flex-col md:flex-row gap-4 items-end">
               <div className="flex-1">
                 <Text strong>选择群聊：</Text>
@@ -210,59 +242,73 @@ export default function Home() {
               </div>
             )}
           </Card>
+          </div>
 
           {stats.length > 0 ? (
-            <Space direction="vertical" size="large" className="w-full">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <Card title="发言次数排行榜 Top 10" className="shadow-sm">
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart
-                      data={chartData}
-                      margin={{
-                        top: 20,
-                        right: 30,
-                        left: 20,
-                        bottom: 60,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="name" 
-                        angle={-45} 
-                        textAnchor="end"
-                        height={60}
-                      />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="value" name="发言次数">
-                        {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-              </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="mb-8 bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                <RankingBoard 
+                  data={rankingData}
+                  title="群聊活跃度排行榜"
+                  subtitle="基于发言次数统计的群成员活跃度排名，Top3 采用领奖台布局并配合彩色徽章强调名次；Top4+ 采用玻璃拟态卡片。"
+                  maxItems={12}
+                />
+              </div>
+              
+              {/* 原本的图表展示 */}
+              <div className='mb-8'>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
-                <Card title="发言详细数据" className="shadow-sm">
-                  <Table 
-                    columns={columns} 
-                    dataSource={stats} 
-                    rowKey="senderName"
-                    pagination={{ pageSize: 10 }}
-                  />
-                </Card>
-              </motion.div>
-            </Space>
+              <Card className="shadow-sm">
+                <Title level={4} className="mb-4 text-center">发言次数排行榜 (Top 10)</Title>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="name" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      interval={0}
+                    />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value: number) => [value.toLocaleString(), '发言次数']}
+                      labelFormatter={(label: string) => `发言人: ${label}`}
+                    />
+                    <Legend />
+                    <Bar 
+                      dataKey="count" 
+                      fill="#3b82f6" 
+                      name="发言次数"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+              </div>
+              
+              {/* 原本的表格展示 */}
+              <Card className="shadow-sm">
+                <Title level={4} className="mb-4">发言详细数据</Title>
+                <Table 
+                  columns={columns}
+                  dataSource={tableData}
+                  pagination={{
+                    pageSize: 10,
+                    showSizeChanger: true,
+                    showQuickJumper: true,
+                    showTotal: (total, range) => 
+                      `第 ${range[0]}-${range[1]} 条，共 ${total} 条记录`,
+                  }}
+                  scroll={{ x: 600 }}
+                  size="middle"
+                />
+              </Card>
+            </motion.div>
           ) : !searching && (
             <Card className="text-center py-12">
               <Empty description="暂无数据，请选择群聊和时间范围进行查询" />

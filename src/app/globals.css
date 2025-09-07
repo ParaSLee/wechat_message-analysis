@@ -50,3 +50,50 @@ body {
     padding: 12px;
   }
 }
+
+/* 排行榜 Demo 公共样式 */
+.podium-gold {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #fff;
+}
+.podium-silver {
+  background: linear-gradient(135deg, #94a3b8, #cbd5e1);
+  color: #0f172a;
+}
+.podium-bronze {
+  background: linear-gradient(135deg, #b45309, #f59e0b);
+  color: #fff;
+}
+.rank-badge {
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+
+/* Neumorphism 拟物卡片 */
+.neu-surface {
+  background: #eef2f7;
+}
+.neu-card {
+  background: #eef2f7;
+  border-radius: 16px;
+  box-shadow: 10px 10px 24px #c7ccd1, -10px -10px 24px #ffffff;
+}
+.neu-pressed {
+  background: #eef2f7;
+  border-radius: 16px;
+  box-shadow: inset 6px 6px 14px #c7ccd1, inset -6px -6px 14px #ffffff;
+}
+
+/* Glassmorphism 毛玻璃卡片 */
+.glass-bg {
+  background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(16,185,129,0.18));
+}
+.glass-card {
+  background: rgba(255,255,255,0.35);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
