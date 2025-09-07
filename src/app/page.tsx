@@ -12,8 +12,10 @@ import {
   Typography, 
   Empty,
   Progress,
-  Table
+  Table,
+  Space
 } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import dayjs from 'dayjs';
@@ -43,20 +45,21 @@ export default function Home() {
   const [totalMessages, setTotalMessages] = useState<number>(0);
   
   // 加载群聊列表
-  useEffect(() => {
-    const loadChatrooms = async () => {
-      setLoading(true);
-      try {
-        const data = await getChatrooms();
-        setChatrooms(data);
-      } catch (error) {
-        message.error('获取群聊列表失败，请确保本地服务已启动');
-        console.error('Failed to load chatrooms:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadChatrooms = async () => {
+    setLoading(true);
+    try {
+      const data = await getChatrooms();
+      setChatrooms(data);
+      message.success(`成功获取 ${data.length} 个群聊`);
+    } catch (error) {
+      message.error('获取群聊列表失败，请确保本地服务已启动');
+      console.error('Failed to load chatrooms:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadChatrooms();
   }, []);
 
@@ -197,23 +200,33 @@ export default function Home() {
             <div className="flex flex-col md:flex-row gap-4 items-end">
               <div className="flex-1">
                 <Text strong>选择群聊：</Text>
-                <Select
-                  className="w-full mt-2"
-                  placeholder="请选择群聊"
-                  loading={loading}
-                  value={selectedChatroom}
-                  onChange={setSelectedChatroom}
-                  options={Array.isArray(chatrooms) ? chatrooms.map((item) => ({
-                    label: item.nickname || item.wxid,
-                    value: item.wxid,
-                  })) : []}
-                  showSearch
-                  filterOption={(input, option) =>
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                  }
-                  mode="tags"
-                  allowClear
-                />
+                <Space.Compact className="w-full mt-2">
+                  <Select
+                    className="flex-1"
+                    placeholder="请选择群聊"
+                    loading={loading}
+                    value={selectedChatroom}
+                    onChange={setSelectedChatroom}
+                    options={Array.isArray(chatrooms) ? chatrooms.map((item) => ({
+                      label: item.nickname || item.wxid,
+                      value: item.wxid,
+                    })) : []}
+                    showSearch
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
+                    mode="tags"
+                    allowClear
+                  />
+                  <Button 
+                    icon={<ReloadOutlined />} 
+                    onClick={loadChatrooms}
+                    loading={loading}
+                    title="刷新群聊列表"
+                  >
+                    刷新
+                  </Button>
+                </Space.Compact>
               </div>
               
               <div className="flex-1">

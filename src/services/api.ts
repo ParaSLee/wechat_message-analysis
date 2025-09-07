@@ -12,19 +12,7 @@ export interface ChatroomItem {
   remark: string;
 }
 
-export interface ContactItem {
-  wxid: string;
-  nickname: string;
-  remark: string;
-}
 
-export interface SessionItem {
-  talker: string;
-  talkerName: string;
-  isChatRoom: boolean;
-  lastTime: string;
-  lastContent: string;
-}
 
 export interface ChatlogItem {
   seq: number;
@@ -45,92 +33,62 @@ export interface SenderStats {
   count: number;
 }
 
-// 模拟数据
-const mockChatrooms: ChatroomItem[] = [
-  { wxid: 'chatroom1', nickname: '家人群', remark: '家人群' },
-  { wxid: 'chatroom2', nickname: '同事群', remark: '同事群' },
-  { wxid: 'chatroom3', nickname: '朋友群', remark: '朋友群' },
-  { wxid: 'chatroom4', nickname: '同学群', remark: '同学群' },
-];
+
+
+
 
 // 获取群聊列表
 export const getChatrooms = async (): Promise<ChatroomItem[]> => {
   try {
-    const response = await api.get('/api/v1/chatroom');
-    return response.data;
+    const response = await api.get('/api/v1/chatroom', {
+      headers: {
+        'Accept': 'application/json'
+      },
+      params: {
+        format: 'json'
+      }
+    });
+    
+    // 如果是JSON格式，检查是否有items属性
+    if (response.data && response.data.items && Array.isArray(response.data.items)) {
+      console.log('API返回JSON格式，包含items数组');
+      // 转换API返回的数据格式为ChatroomItem格式
+      return response.data.items.map((item: any) => ({
+        wxid: item.name || item.userName || item.wxid || '',
+        nickname: item.nickName || item.nickname || item.displayName || item.name || '未命名群聊',
+        remark: item.remark || item.nickName || item.nickname || item.displayName || item.name || ''
+      })).filter(item => item.wxid && item.wxid.trim() !== ''); // 过滤掉空的wxid
+    }
+    
+    // 如果直接是数组格式
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    
+    console.warn('未知的API响应格式:', response.data);
+    return [];
   } catch (error) {
-    console.error('Failed to fetch chatrooms, using mock data:', error);
-    return mockChatrooms;
+    console.error('Failed to fetch chatrooms:', error);
+    return [];
   }
 };
 
-// 获取联系人列表
-export const getContacts = async (): Promise<ContactItem[]> => {
-  const response = await api.get('/api/v1/contact');
-  return response.data;
-};
 
-// 获取会话列表
-export const getSessions = async (): Promise<SessionItem[]> => {
-  const response = await api.get('/api/v1/session');
-  return response.data;
-};
 
-// 模拟聊天记录数据
-const generateMockChatlog = (talker: string, count: number = 100): ChatlogItem[] => {
-  const mockSenders = [
-    { name: '张三', count: 30 },
-    { name: '李四', count: 25 },
-    { name: '王五', count: 20 },
-    { name: '赵六', count: 15 },
-    { name: '钱七', count: 10 },
-    { name: '孙八', count: 8 },
-    { name: '周九', count: 7 },
-    { name: '吴十', count: 5 },
-    { name: '郑十一', count: 3 },
-    { name: '王十二', count: 2 },
-  ];
-  
-  const result: ChatlogItem[] = [];
-  let seq = 1;
-  
-  // 根据每个发言人的权重生成消息
-  mockSenders.forEach(sender => {
-    for (let i = 0; i < sender.count; i++) {
-      const time = new Date();
-      time.setHours(time.getHours() - Math.floor(Math.random() * 24));
-      
-      result.push({
-        seq: seq++,
-        time: time.toISOString(),
-        talker: talker,
-        talkerName: talker === 'chatroom1' ? '家人群' : 
-                  talker === 'chatroom2' ? '同事群' : 
-                  talker === 'chatroom3' ? '朋友群' : '同学群',
-        isChatRoom: true,
-        sender: `wxid_${sender.name}`,
-        senderName: sender.name,
-        isSelf: sender.name === '张三',
-        type: 1,
-        subType: 0,
-        content: `这是${sender.name}的第${i+1}条消息`
-      });
-    }
-  });
-  
-  // 随机排序
-  return result.sort(() => Math.random() - 0.5);
-};
+
 
 // 获取聊天记录
 export const getChatlog = async (
   talker: string,
-  time: string,
+  time: string = '2020-01-01,2030-12-31',
   limit: number = 200,
   offset: number = 0
 ): Promise<ChatlogItem[]> => {
   try {
     const response = await api.get('/api/v1/chatlog', {
+      headers: {
+        'Accept': 'application/json'
+      },
       params: {
         talker,
         time,
@@ -139,11 +97,24 @@ export const getChatlog = async (
         format: 'json',
       },
     });
-    return response.data;
+    
+    // 如果直接是数组格式（这是实际的API响应格式）
+    if (Array.isArray(response.data)) {
+      console.log('聊天记录API返回JSON数组格式');
+      return response.data;
+    }
+    
+    // 如果是JSON格式，检查是否有items属性
+    if (response.data && response.data.items && Array.isArray(response.data.items)) {
+      console.log('聊天记录API返回JSON格式，包含items数组');
+      return response.data.items;
+    }
+    
+    console.warn('聊天记录API返回未知格式:', response.data);
+    return [];
   } catch (error) {
-    console.error('Failed to fetch chatlog, using mock data:', error);
-    const mockData = generateMockChatlog(talker);
-    return mockData.slice(offset, offset + limit);
+    console.error('Failed to fetch chatlog:', error);
+    return [];
   }
 };
 
