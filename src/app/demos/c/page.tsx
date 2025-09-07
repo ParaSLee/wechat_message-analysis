@@ -1,11 +1,9 @@
 "use client";
 
 import { Card, Typography, Space } from "antd";
+import { generateDemoData } from '@/utils/mockData';
 
-const data = Array.from({ length: 9 }).map((_, i) => ({
-  name: `成员${i + 1}`,
-  value: Math.round(Math.random() * 100 + 20),
-}));
+const data = generateDemoData('c');
 
 export default function DemoC() {
   return (

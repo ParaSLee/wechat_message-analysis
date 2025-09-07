@@ -2,10 +2,9 @@
 
 import { Card, Typography } from "antd";
 
-const data = Array.from({ length: 9 }).map((_, i) => ({
-  name: `成员${i + 1}`,
-  value: Math.round(Math.random() * 160 + 40),
-})).sort((a,b)=>b.value-a.value);
+import { generateDemoData } from '@/utils/mockData';
+
+const data = generateDemoData('e');
 
 export default function DemoE() {
   const max = Math.max(...data.map(d=>d.value));

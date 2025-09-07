@@ -2,11 +2,9 @@
 
 import { Card, Typography, Space, Progress } from "antd";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { generateDemoData } from '@/utils/mockData';
 
-const mock = Array.from({ length: 10 }).map((_, i) => ({
-  name: `成员${i + 1}`,
-  value: Math.round(Math.random() * 120 + 20),
-}));
+const mock = generateDemoData('a');
 
 export default function DemoA() {
   const max = Math.max(...mock.map(m => m.value));

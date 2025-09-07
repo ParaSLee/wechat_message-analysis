@@ -6,23 +6,7 @@ import { Card, Typography, Row, Col } from "antd";
 // 方案G：Top3 领奖台 + Top4-10 玻璃拟态卡片；Top1-6 加授图中风格的“徽章”效果（光晕/星点/高光）。
 // 为避免 SSR/CSR 水合不一致，使用可复现的种子随机 mock 数据。
 
-function mulberry32(seed: number) {
-  return function () {
-    let t = (seed += 0x6d2b79f5);
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function generateData(seed = 77) {
-  const rand = mulberry32(seed);
-  const base = Array.from({ length: 12 }).map((_, i) => ({
-    name: `成员${i + 1}`,
-    value: Math.round(rand() * 200 + 80),
-  }));
-  return base.sort((a, b) => b.value - a.value);
-}
+import { generateDemoData } from '@/utils/mockData';
 
 // 新增：类型定义，避免使用 any
 type Variant = "gray" | "emerald" | "gold" | "green" | "pink" | "silver";
@@ -241,7 +225,7 @@ const BadgeSVG = ({ variant = "gold" }: { variant?: Variant }) => {
  } 
 
 export default function DemoG() {
-  const data = useMemo(() => generateData(2025), []);
+  const data = useMemo(() => generateDemoData('g'), []);
   const max = useMemo(() => Math.max(...data.map((d) => d.value)), [data]);
 
   const podium = data.slice(0, 3);

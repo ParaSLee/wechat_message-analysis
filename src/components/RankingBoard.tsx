@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { Card, Typography, Row, Col } from "antd";
 import { getBadgeByRank } from "./BadgeSVG";
-// import BadgeEffect from "./BadgeEffect"; // 4-6名徽章效果组件，需要时可取消注释使用
 
 // 排行榜数据项类型
 export interface RankingItem {
@@ -81,15 +80,12 @@ export const RankingBoard = ({
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
            {others.map((item, idx) => {
              const rank = idx + 4;
-             // const showBadge = rank <= 6; // 4-6名徽章效果已注释
              const percent = Math.round((item.value / max) * 100);
              return (
                <div key={item.name} style={{ position: "relative" }}>
                  <div className="glass-card p-6 relative overflow-visible">
                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
                      <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
-                       {/* 4-6名徽章效果已注释，如需使用请取消下面的注释并导入BadgeEffect组件 */}
-                       {/* <BadgeEffect rank={rank} showBadge={rank <= 6} /> */}
                        <div style={{ flex: 1, minWidth: 0 }}>
                          <div style={{ fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#0f172a" }}>
                            {item.name}

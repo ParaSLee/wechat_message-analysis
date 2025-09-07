@@ -117,26 +117,3 @@ export const getChatlog = async (
     return [];
   }
 };
-
-// 处理聊天记录，统计每个人的发言次数
-export const processChatlogStats = (chatlog: ChatlogItem[]): SenderStats[] => {
-  const senderMap = new Map<string, number>();
-
-  chatlog.forEach((item) => {
-    const sender = item.senderName;
-    if (sender) {
-      senderMap.set(sender, (senderMap.get(sender) || 0) + 1);
-    }
-  });
-
-  // 转换为数组并排序
-  const result: SenderStats[] = Array.from(senderMap.entries()).map(([senderName, count]) => ({
-    senderName,
-    count,
-  }));
-
-  // 按发言次数降序排序
-  result.sort((a, b) => b.count - a.count);
-
-  return result;
-};

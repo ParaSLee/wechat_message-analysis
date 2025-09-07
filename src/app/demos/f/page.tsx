@@ -6,27 +6,10 @@ import { Typography, Card, Row, Col } from "antd";
 // 设计灵感：Dribbble 上常见的玻璃拟态/渐变胶囊/彩色头像环，强调层级与色彩节奏。
 // 为避免 Next.js SSR/CSR Hydration 不一致，使用“种子随机数”生成稳定的 mock 数据。
 
-// 简易种子随机：mulberry32
-function mulberry32(seed: number) {
-  return function () {
-    let t = (seed += 0x6d2b79f5);
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function generateMock(seed = 123456) {
-  const rand = mulberry32(seed);
-  const arr = Array.from({ length: 12 }).map((_, i) => ({
-    name: `成员${i + 1}`,
-    value: Math.round(rand() * 160 + 40),
-  }));
-  return arr.sort((a, b) => b.value - a.value);
-}
+import { generateDemoData } from '@/utils/mockData';
 
 export default function DemoF() {
-  const data = useMemo(() => generateMock(42), []);
+  const data = useMemo(() => generateDemoData('f'), []);
   const max = useMemo(() => Math.max(...data.map((m) => m.value)), [data]);
 
   return (

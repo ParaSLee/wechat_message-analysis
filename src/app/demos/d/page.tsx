@@ -3,10 +3,9 @@
 import { Card, Typography, Table, Avatar, Tag, Progress, Space } from "antd";
 
 interface Row { name: string; value: number; }
-const rows: Row[] = Array.from({ length: 30 }).map((_, i) => ({
-  name: `成员${i + 1}`,
-  value: Math.round(Math.random() * 120 + 10),
-})).sort((a,b)=>b.value-a.value);
+import { generateDemoData } from '@/utils/mockData';
+
+const rows: Row[] = generateDemoData('d');
 
 export default function DemoD() {
   const max = Math.max(...rows.map(r=>r.value));

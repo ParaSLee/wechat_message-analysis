@@ -7,10 +7,9 @@ import { useState } from "react";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d", "#ffc658", "#8dd1e1", "#a4de6c", "#d0ed57"]; 
 
-const data = Array.from({ length: 12 }).map((_, i) => ({
-  name: `成员${i + 1}`,
-  value: Math.round(Math.random() * 150 + 50),
-}));
+import { generateDemoData } from '@/utils/mockData';
+
+const data = generateDemoData('b');
 
 export default function DemoB() {
   const [view, setView] = useState<'chart' | 'list' | 'cards'>('chart');
